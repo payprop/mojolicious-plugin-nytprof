@@ -14,9 +14,10 @@ WriteMakefile(
   PREREQ_PM => {
     'Devel::NYTProf' => '5.06',
     'Mojolicious'    => '4.83',
+    'File::Which'    => 0,
   },
   BUILD_REQUIRES => {
-    'Test::More'      => 0.90,
+    'Test::More'      => 0,
     'Test::Exception' => 0.32,
   },
   META_MERGE => {
