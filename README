@@ -1,0 +1,34 @@
+NAME
+    Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your
+    Mojolicious app
+
+VERSION
+    0.01
+
+DESCRIPTION
+    This plugin enables Mojolicious to automatically generate Devel::NYTProf
+    profiles and routes for your app
+
+SYNOPSIS
+      use Mojolicious::Lite;
+
+      plugin NYTProf => {
+        nytprof => {
+          profiles_dir     => '/some_tmp_dir/',
+          nytprofhtml_path => '/path/to/nytprofhtml',
+        },
+      };
+
+      app->start;
+
+METHODS
+  register
+    Registers the plugin with your app - this will only do something if the
+    nytprof key exists in your config hash
+
+      register
+          $self->register($app, \%config);
+
+AUTHOR
+    Lee Johnson - `leejo@cpan.org'
+
