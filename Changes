@@ -1,0 +1,4 @@
+Revision history for Mojolicious-Plugin-NYTProf
+
+0.01     Jeu 24 avr 2014 15:53:31 CEST
+       * First release, inspired by Dancer::Plugin::NYTProf
