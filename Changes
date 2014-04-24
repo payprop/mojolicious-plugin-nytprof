@@ -1,4 +1,9 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.02     Jeu 24 avr 2014 20:14:27 CEST
+        * [Fix] Tweak tests for content of Devel::NYTProf output
+            as calling ->content_like doesn't DTRT all the time
+        * [Add] t/test_app.pl for running to test actual browser interaction
+
 0.01     Jeu 24 avr 2014 15:53:31 CEST
-       * First release, inspired by Dancer::Plugin::NYTProf
+        * First release, inspired by Dancer::Plugin::NYTProf
