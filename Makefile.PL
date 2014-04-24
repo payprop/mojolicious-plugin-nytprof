@@ -13,8 +13,11 @@ WriteMakefile(
   LICENSE       => 'perl',
   PREREQ_PM => {
     'Devel::NYTProf' => '5.06',
-    'Mojolicious'    => '4.83',
-    'File::Which'    => 0,
+    'Mojolicious'           => '4.24',
+    'File::Which'           => '1.09',
+    'File::Temp'            => '0.22',
+    'Time::HiRes'           => '1.9719',
+    'File::Spec::Functions' => '3.30',
   },
   BUILD_REQUIRES => {
     'Test::More'      => 0,

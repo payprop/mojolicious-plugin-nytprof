@@ -7,27 +7,60 @@ VERSION
 
 DESCRIPTION
     This plugin enables Mojolicious to automatically generate Devel::NYTProf
-    profiles and routes for your app
+    profiles and routes for your app, it has been inspired by
+    Dancer::Plugin::NYTProf
 
 SYNOPSIS
       use Mojolicious::Lite;
 
       plugin NYTProf => {
         nytprof => {
+          # optional, will default to nytprof
           profiles_dir     => '/some_tmp_dir/',
+          # optional
           nytprofhtml_path => '/path/to/nytprofhtml',
         },
       };
 
       app->start;
 
+    Or
+
+      use Mojo::Base 'Mojolicious';
+
+      ...
+
+      sub startup {
+        my $self = shift;
+
+        ...
+
+        my $mojo_config = $self->plugin('Config');
+        # where config contains the necessary keys as show above
+        $self->plugin(NYTProf => $mojo_config);
+      }
+
+    Then run your app. Profiles generated can be seen by visting /nytprof
+    and reports will be generated on the fly why you click on a specific
+    profile.
+
 METHODS
   register
     Registers the plugin with your app - this will only do something if the
     nytprof key exists in your config hash
 
-      register
-          $self->register($app, \%config);
+      $self->register($app, \%config);
+
+HOOKS AND Devel::NYTProf
+    When the nytprof key is missing from your config (or commented out) none
+    of the nytprof routes will be loaded and the Devel::NYTProf module will
+    not be imported.
+
+    The plugin adds hooks to control the level of profiling, Devel::NYTProf
+    profiling is started using a before_routes hook and the stopped with an
+    after_dispatch hook. The consequence of this is that you should see
+    profiling only for your routes and rendering code and will not see most
+    of the actual Mojolicious framework detail.
 
 AUTHOR
     Lee Johnson - `leejo@cpan.org'
