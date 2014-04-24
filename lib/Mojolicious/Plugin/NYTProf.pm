@@ -94,6 +94,8 @@ sub _add_hooks {
   my $nytprof  = $config->{nytprof};
   my $prof_dir = $nytprof->{profiles_dir} || 'nytprof';
 
+  push @{$app->static->paths},catfile($prof_dir,'html');
+
   $app->hook(before_dispatch => sub {
     my $c = shift;
     my $path = $c->req->url->to_string;
@@ -172,7 +174,7 @@ sub _profiles {
     my $profile;
     my $filepath = catfile($prof_dir,$file);
     my $label = $file;
-    $label =~ s{nytprof\.out\.(\d+)\.(\d+)\.}{};
+    $label =~ s{nytprof_out_(\d+)_(\d+)_}{};
     my ($sec, $usec) = ($1,$2);
     $label =~ s{\.}{/}g;
     $label =~ s{/(\d+)$}{};
@@ -225,7 +227,7 @@ sub _generate_profile {
     }
   }
 
-  $self->redirect_to("/nytprof/html/$file");
+  $self->redirect_to("${file}index.html");
 }
 
 sub _show_profile {
@@ -233,7 +235,7 @@ sub _show_profile {
   my $prof_dir = shift;
   my $dir = $self->stash('dir');
 
-  $self->render_static("$prof_dir/html/$dir/index.html");
+  $self->redirect_to("${dir}index.html");
 }
 
 =head1 AUTHOR
