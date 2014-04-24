@@ -47,7 +47,7 @@ my $t = Test::Mojo->new;
 
 $t->get_ok('/nytprof')
   ->status_is(200)
-  ->content_is("list nytprof profiles\n");
+  ->content_like(qr{<p>No profiles found</p>});
 
 ok(
   !-e catfile($prof_dir, "nytprof.out.some_route.$$"),
@@ -56,19 +56,29 @@ ok(
 
 $t->get_ok('/some_route')
   ->status_is(200)
-  ->content_is("basic stuff\n");
+  ->content_is("basic stuff\n") for 1 .. 3;
 
-ok(
-  -e catfile($prof_dir, "nytprof.out.some_route.$$"),
-  'nytprof.out file created'
-);
+my @profiles = Mojolicious::Plugin::NYTProf::_profiles($prof_dir);
 
-$t->get_ok("/nytprof/nytprof.out.some_route.$$")
+foreach my $prof (@profiles) {
+  ok(-e catfile($prof_dir, $prof->{file}), $prof->{file}." created");
+}
+
+$t->ua->max_redirects(5);
+
+$t->get_ok('/nytprof')
   ->status_is(200)
+  ->content_like(qr{<a href="/nytprof/nytprof_out_\d+_\d+_some_route_\d+">});
+
+TODO: {
+  local $TODO = "redirect to profiles";
+$t->get_ok("/nytprof/".$profiles[0]->{file}.'/')
+  ->status_is(302)
   ->content_is("generate nytprof profile\n");
 
-$t->get_ok("/nytprof/html/nytprof.out.some_route.$$")
-  ->status_is(200)
+$t->get_ok("/nytprof/html/".$profiles[0]->{file}.'/')
+  ->status_is(302)
   ->content_is("show nytprof profile\n");
+}
 
 done_testing();

@@ -28,10 +28,14 @@ profiles and routes for your app
 
 =cut
 
+use strict;
+use warnings;
+
 use Mojo::Base 'Mojolicious::Plugin';
+use Time::HiRes 'gettimeofday';
 use File::Temp;
 use File::Which;
-use File::Spec::Functions 'catfile';
+use File::Spec::Functions qw/catfile catdir/;
 
 use Data::Dumper;
 
@@ -80,12 +84,12 @@ sub register {
     require Devel::NYTProf;
     unlink $file;
 
-    $self->_add_hooks($app, $config);
+    $self->_add_hooks($app, $config, $nytprofhtml_path);
   }
 }
 
 sub _add_hooks {
-  my ($self, $app, $config) = @_;
+  my ($self, $app, $config, $nytprofhtml_path) = @_;
 
   my $nytprof  = $config->{nytprof};
   my $prof_dir = $nytprof->{profiles_dir} || 'nytprof';
@@ -96,7 +100,8 @@ sub _add_hooks {
     return if $path =~ m{^/nytprof}; # viewing profiles
     $path =~ s!^/!!g;
     $path =~ s!/!-!g;
-    DB::enable_profile(catfile($prof_dir,"nytprof.out.$path.$$"));
+    my ($sec, $usec) = gettimeofday;
+    DB::enable_profile(catfile($prof_dir,"nytprof_out_${sec}_${usec}_${path}_$$"));
   });
 
   $app->hook(after_dispatch => sub {
@@ -104,41 +109,131 @@ sub _add_hooks {
     DB::finish_profile();
   });
 
-  $app->routes->any('/nytprof/:file'
-    #=> [file => qr/^nytprof\.out\..*/]
-    => [file => qr/\w+/]
-    => \&_generate_profile
+  $app->routes->get('/nytprof/html/:dir'
+    => [dir => qr/nytprof_out_\d+_\d+.*/]
+    => sub { _show_profile(@_,$prof_dir) }
   );
-  $app->routes->any('/nytprof/html/:file' => \&_show_profile);
-  $app->routes->any('/nytprof' => sub { _list_profiles(@_,$prof_dir) });
+
+  $app->routes->get('/nytprof/:file'
+    => [file => qr/nytprof_out_\d+_\d+.*/]
+    => sub { _generate_profile(@_,$prof_dir,$nytprofhtml_path) }
+  );
+
+  $app->routes->get('/nytprof' => sub { _list_profiles(@_,$prof_dir) });
 }
 
 sub _list_profiles {
   my $self = shift;
   my $prof_dir = shift;
 
+  $self->stash(profiles => [_profiles($prof_dir)]);
+  my $ep = <<'EndOfEp';
+<html>
+  <head>
+    <title>NYTProf profile run list</title>
+  </head>
+  <body>
+    <h1>Profile run list</h1>
+    % if (@{$profiles}) {
+      <p>Select a profile run output from the list to view the HTML reports as
+  produced by <tt>Devel::NYTProf</tt>.</p>
+      <ul>
+      % for (@{$profiles}) {
+      <li>
+        <a href="<%= $_->{url} %>"><%= $_->{label} %></a>
+          (PID <%= $_->{pid} %>, <%= $_->{created} %>, <%= $_->{duration} %>)
+      </li>
+      % }
+      </ul>
+    % } else {
+      <p>No profiles found</p>
+    %}
+  </body>
+</html>
+EndOfEp
+
+  $self->render(inline => $ep);
+}
+
+sub _profiles {
+  my $prof_dir = shift;
+
   require Devel::NYTProf::Data;
   opendir my $dirh, $prof_dir
       or die "Unable to open profiles dir $prof_dir - $!";
-  my @files = grep { /^nytprof\.out/ } readdir $dirh;
+  my @files = grep { /^nytprof_out/ } readdir $dirh;
   closedir $dirh;
 
-  $self->render(text => "list nytprof profiles\n");
+  my @profiles;
+
+  for my $file ( sort {
+    (stat catfile($prof_dir,$b))[10] <=> (stat catfile($prof_dir,$a))[10]
+  } @files ) {
+    my $profile;
+    my $filepath = catfile($prof_dir,$file);
+    my $label = $file;
+    $label =~ s{nytprof\.out\.(\d+)\.(\d+)\.}{};
+    my ($sec, $usec) = ($1,$2);
+    $label =~ s{\.}{/}g;
+    $label =~ s{/(\d+)$}{};
+    my $pid = $1;
+
+    my ($nytprof,$duration);
+    eval { $nytprof = Devel::NYTProf::Data->new({filename => $filepath}); };
+
+    $profile->{duration} = $nytprof
+      ? sprintf('%.4f secs', $nytprof->attributes->{profiler_duration})
+      : '??? seconds - corrupt profile data?';
+
+    @{$profile}{qw/file url pid created label/}
+      = ($file,"/nytprof/$file",$pid,scalar localtime($sec),$label);
+    push(@profiles,$profile);
+  }
+
+  return @profiles;
 }
 
 sub _generate_profile {
   my $self = shift;
+  my $htmldir = my $prof_dir = shift;
+  my $nytprofhtml_path = shift;
 
-  my $file = $self->param('file');
-warn "-->$file";
+  my $file    = $self->stash('file');
+  my $profile = catfile($prof_dir, $file);
+  return $self->render_not_found if !-f $profile;
+  
+  foreach my $sub_dir ('html',$file) {
+    $htmldir = catfile($htmldir, $sub_dir);
 
-  $self->render(text => "generate nytprof profile\n");
+    if (! -d $htmldir) {
+      mkdir $htmldir
+        or die "$htmldir does not exist and cannot create - $!";
+    }
+  }
+
+  if (! -f catfile($htmldir, 'index.html')) {
+    system($nytprofhtml_path, "--file=$profile", "--out=$htmldir");
+
+    if ($? == -1) {
+      die "'$nytprofhtml_path' failed to execute: $!";
+    } elsif ($? & 127) {
+      die sprintf "'%s' died with signal %d, %s coredump",
+        $nytprofhtml_path,,($? & 127),($? & 128) ? 'with' : 'without';
+    } elsif ($? != 0) {
+      die sprintf "'%s' exited with value %d", 
+        $nytprofhtml_path, $? >> 8;
+    }
+  }
+
+  $self->redirect_to("/nytprof/html/$file");
 }
 
 sub _show_profile {
   my $self = shift;
+  my $prof_dir = shift;
+  my $dir = $self->stash('dir');
 
-  $self->render(text => "show nytprof profile\n");
+  $self->render_static("$prof_dir/html/$dir/index.html");
 }
 
 =head1 AUTHOR
