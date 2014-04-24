@@ -1,0 +1,9 @@
+.git
+\.old
+\.swp
+~$
+^blib/
+^Makefile$
+^MANIFEST.*
+^MYMETA*
+^Mojolicious-Plugin-NYTProf

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+README
+README.pod
+lib/Mojolicious/Plugin/NYTProf.pm
+t/001_compiles_pod.t
+t/005_plugin_not_configured.t
+t/010_nytprof.t

@@ -6,3 +6,4 @@ pm_to_blib
 *.old
 *.bak
 t/nytprof
+Mojolicious-Plugin-NYTProf*.gz
