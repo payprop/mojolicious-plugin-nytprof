@@ -3,7 +3,7 @@ NAME
     Mojolicious app
 
 VERSION
-    0.01
+    0.03
 
 DESCRIPTION
     This plugin enables Mojolicious to automatically generate Devel::NYTProf

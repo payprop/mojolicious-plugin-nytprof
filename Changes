@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.03     Jeu 24 avr 2014 21:37:47 CEST
+        * [Add] Best attempt to find nytprofhtml script
+
 0.02     Jeu 24 avr 2014 20:14:27 CEST
         * [Fix] Tweak tests for content of Devel::NYTProf output
             as calling ->content_like doesn't DTRT all the time
