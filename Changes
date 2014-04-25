@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.04     Ven 25 avr 2014 08:56:21 CEST
+        * [Fix] Better attempt to find nytprofhtml script
+
 0.03     Jeu 24 avr 2014 21:37:47 CEST
         * [Add] Best attempt to find nytprofhtml script
 

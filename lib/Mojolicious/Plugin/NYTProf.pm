@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 METHODS
 
@@ -95,7 +95,7 @@ sub register {
     if ( ! $nytprofhtml_path ) {
       # last ditch attempt to find nytprofhtml, assume in same dir as perl
       $nytprofhtml_path = $^X;
-      $nytprofhtml_path =~ s/perl[\d\.]+$/nytprofhtml/;
+      $nytprofhtml_path =~ s/perl[\d\.]*$/nytprofhtml/;
     }
 
     -e $nytprofhtml_path
