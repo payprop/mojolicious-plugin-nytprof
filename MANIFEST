@@ -11,4 +11,5 @@ t/020_no_production.t
 t/025_nytprof_env.t
 t/030_config_hooks.t
 t/public
+t/public/some_static_file
 t/test_app.pl
