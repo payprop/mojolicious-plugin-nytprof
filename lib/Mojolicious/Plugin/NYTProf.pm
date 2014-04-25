@@ -74,6 +74,7 @@ key exists in your config hash
 
 The plugin adds hooks to control the level of profiling, Devel::NYTProf profiling
 is started using a before_routes hook and the stopped with an after_dispatch hook.
+
 The consequence of this is that you should see profiling only for your routes and
 rendering code and will not see most of the actual Mojolicious framework detail.
 
@@ -100,6 +101,16 @@ Here's what you can control in myapp.conf:
       # the default value is 0 so you can deploy your app to prod without
       # having to make any changes to config/plugin register
       allow_production => 0,
+
+      # Devel::NYTProf environment options, see the documentation at
+      # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
+      # for a complete list. N.B. you can't supply start or file as these
+      # are used internally in the plugin so will be ignored if passed
+      env {
+        trace => 1,
+        log   => "/path/to/foo/",
+        ....
+      },
     },
   }
 
@@ -142,9 +153,16 @@ sub register {
     my $file      = $tempfh->filename;
     $tempfh       = undef; # let the file get deleted
 
-    # TODO: allow options to be passed for values listed in
     # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
-    $ENV{NYTPROF} = "start=no:file=$file";
+    # options for Devel::NYTProf - any can be passed but will always set
+    # the start and file options here
+    $nytprof->{env}{start} = 'no';
+    $nytprof->{env}{file}  = $file;
+
+    $ENV{NYTPROF} = join( ':',
+      map { "$_=" . $nytprof->{env}{$_} }
+        keys %{ $nytprof->{env} }
+    );
 
     require Devel::NYTProf;
     unlink $file;
