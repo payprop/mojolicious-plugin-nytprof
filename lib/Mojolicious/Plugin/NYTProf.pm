@@ -72,22 +72,45 @@ key exists in your config hash
 
 =head1 HOOKS AND Devel::NYTProf
 
-When the nytprof key is missing from your config (or commented out) none of the
-nytprof routes will be loaded and the Devel::NYTProf module will not be imported.
-
 The plugin adds hooks to control the level of profiling, Devel::NYTProf profiling
 is started using a before_routes hook and the stopped with an after_dispatch hook.
 The consequence of this is that you should see profiling only for your routes and
 rendering code and will not see most of the actual Mojolicious framework detail.
+
+=head1 CONFIGURATION
+
+Here's what you can control in myapp.conf:
+
+  {
+    # Devel::NYTProf will only be loaded, and profiling enabled, if the nytprof
+    # key is present in your config file, so either remove it or comment it out
+    # to completely disable profiling.
+    nytprof => {
+
+      # path to your nytprofhtml script (installed as part of Devel::NYTProf
+      # distribution). the plugin will do its best to try to find this so this
+      # is optional, just set if you have a none standard path
+      nytprofhtml_path => '/path/to/nytprofhtml',
+
+      # path to store Devel::NYTProf output profiles and generated html pages.
+      # options, defaults to "/path/to/your/app/root/dir/nytprof"
+      profiles_dir => '/path/to/nytprof/profiles/'
+
+      # set this to true to allow the plugin to run when in production mode
+      # the default value is 0 so you can deploy your app to prod without
+      # having to make any changes to config/plugin register
+      allow_production => 0,
+    },
+  }
 
 =cut
 
 sub register {
   my ($self, $app, $config) = @_;
 
-  # TODO: check mode and do not enable if production (or require a force
-  # config to allow in production)
   if (my $nytprof = $config->{nytprof}) {
+
+    return if $app->mode eq 'production' and ! $nytprof->{allow_production};
 
     my $nytprofhtml_path = $nytprof->{nytprofhtml_path}
       || File::Which::which('nytprofhtml');

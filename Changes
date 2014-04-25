@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.05     Ven 25 avr 2014 10:23:57 CEST
+		* [Fix] Don't profile static files
+		* [Add] perldoc for configuration
+		* [Add] Disable in production unless forced by config
+
 0.04     Ven 25 avr 2014 08:56:21 CEST
         * [Fix] Better attempt to find nytprofhtml script
 
