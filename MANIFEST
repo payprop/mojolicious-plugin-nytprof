@@ -6,3 +6,9 @@ lib/Mojolicious/Plugin/NYTProf.pm
 t/001_compiles_pod.t
 t/005_plugin_not_configured.t
 t/010_nytprof.t
+t/015_no_static.t
+t/020_no_production.t
+t/025_nytprof_env.t
+t/030_config_hooks.t
+t/public
+t/test_app.pl

@@ -5,6 +5,7 @@ Revision history for Mojolicious-Plugin-NYTProf
 		* [Add] perldoc for configuration
 		* [Add] Disable in production unless forced by config
 		* [Add] Allow passthrough of Devel::NYTProf env options
+		* [Add] Allow config of hooks used to start/stop profiling
 
 0.04     Ven 25 avr 2014 08:56:21 CEST
         * [Fix] Better attempt to find nytprofhtml script

@@ -6,7 +6,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 DESCRIPTION
 
@@ -20,10 +20,7 @@ L<Dancer::Plugin::NYTProf>
 
   plugin NYTProf => {
     nytprof => {
-      # optional, will default to nytprof
-      profiles_dir     => '/some_tmp_dir/',
-      # optional
-      nytprofhtml_path => '/path/to/nytprofhtml',
+      ... # see CONFIGURATION
     },
   };
 
@@ -41,7 +38,6 @@ Or
     ...
 
     my $mojo_config = $self->plugin('Config');
-    # where config contains the necessary keys as show above
     $self->plugin(NYTProf => $mojo_config);
   }
 
@@ -59,7 +55,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 METHODS
 
@@ -77,6 +73,9 @@ is started using a before_routes hook and the stopped with an after_dispatch hoo
 
 The consequence of this is that you should see profiling only for your routes and
 rendering code and will not see most of the actual Mojolicious framework detail.
+
+You can override the hooks used to control when the profiling runs, see the
+CONFIGURATION section below.
 
 =head1 CONFIGURATION
 
@@ -111,6 +110,18 @@ Here's what you can control in myapp.conf:
         log   => "/path/to/foo/",
         ....
       },
+
+      # when to enable Devel::NYTProf profiling - the pre_hook will run
+      # to enable_profile and the post_hook will run to disable_profile
+      # and finish_profile. the values show here are the defaults so you
+      # do not need to provide these options
+      #
+      # N.B. there is nothing stopping you reversing the order of the
+      # hooks, which would cause the Mojolicious framework code to be
+      # profiled, or providing hooks that are the same or even invalid. these
+      # config options should probably be used with some care
+      pre_hook  => 'before_routes',
+      post_hook => 'after_dispatch',
     },
   }
 
@@ -147,25 +158,29 @@ sub register {
       }
     }
 
-    my $tempfh = File::Temp->new(
-      ($nytprof->{profiles_dir} ? (DIR => $nytprof->{profiles_dir}) : () ),
-    );
-    my $file      = $tempfh->filename;
-    $tempfh       = undef; # let the file get deleted
+    # disable config option is undocumented, it allows testing where we
+    # don't actually load or run Devel::NYTProf
+    unless ($nytprof->{disable}) {
+      my $tempfh = File::Temp->new(
+        ($nytprof->{profiles_dir} ? (DIR => $nytprof->{profiles_dir}) : () ),
+      );
+      my $file      = $tempfh->filename;
+      $tempfh       = undef; # let the file get deleted
 
-    # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
-    # options for Devel::NYTProf - any can be passed but will always set
-    # the start and file options here
-    $nytprof->{env}{start} = 'no';
-    $nytprof->{env}{file}  = $file;
+      # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
+      # options for Devel::NYTProf - any can be passed but will always set
+      # the start and file options here
+      $nytprof->{env}{start} = 'no';
+      $nytprof->{env}{file}  = $file;
 
-    $ENV{NYTPROF} = join( ':',
-      map { "$_=" . $nytprof->{env}{$_} }
-        keys %{ $nytprof->{env} }
-    );
+      $ENV{NYTPROF} = join( ':',
+        map { "$_=" . $nytprof->{env}{$_} }
+          keys %{ $nytprof->{env} }
+      );
 
-    require Devel::NYTProf;
-    unlink $file;
+      require Devel::NYTProf;
+      unlink $file;
+    }
 
     $self->_add_hooks($app, $config, $nytprofhtml_path);
   }
@@ -174,8 +189,11 @@ sub register {
 sub _add_hooks {
   my ($self, $app, $config, $nytprofhtml_path) = @_;
 
-  my $nytprof  = $config->{nytprof};
-  my $prof_dir = $nytprof->{profiles_dir} || 'nytprof';
+  my $nytprof   = $config->{nytprof};
+  my $prof_dir  = $nytprof->{profiles_dir} || 'nytprof';
+  my $pre_hook  = $nytprof->{pre_hook}     || 'before_routes';
+  my $post_hook = $nytprof->{post_hook}    || 'after_dispatch';
+  my $disable   = $nytprof->{disable}      || 0;
 
   # add the nytprof/html directory to the static paths
   # so we can serve these without having to add routes
@@ -185,23 +203,38 @@ sub _add_hooks {
   # to avoid confusion with the *dirs* in nytprof/html
   my $prof_sub_dir = catfile( $prof_dir,'profiles' );
 
-  # TODO: allow control of hooks with config variables
-  $app->hook(before_routes => sub {
-    my $c = shift;
-    return if $c->stash->{'mojo.static'}; # static files
-    my $path = $c->req->url->to_string;
+  $app->hook($pre_hook => sub {
+
+    # figure args based on what the hook is
+    my ($tx, $app, $next, $c, $path);
+
+    if ($pre_hook eq 'after_build_tx') {
+      ($tx, $app) = @_[0,1];
+      $path = $pre_hook; # TODO - need better identifier for this?
+    } elsif ($pre_hook =~ /around/) {
+      ($next, $c) = @_[0,1];
+    } else {
+      $c = $_[0];
+      $path = $c->req->url->to_string;
+      return if $c->stash->{'mojo.static'}; # static files
+    }
+
     return if $path =~ m{^/nytprof}; # viewing profiles
     $path =~ s!^/!!g;
     $path =~ s!/!-!g;
+
     my ($sec, $usec) = gettimeofday;
     DB::enable_profile(
       catfile($prof_sub_dir,"nytprof_out_${sec}_${usec}_${path}_$$")
-    );
+    ) unless $disable;
+    return $next->() if $pre_hook =~ /around/;
   });
 
-  $app->hook(after_dispatch => sub {
-    DB::disable_profile();
-    DB::finish_profile();
+  $app->hook($post_hook => sub {
+    DB::disable_profile() unless $disable;
+    DB::finish_profile() unless $disable;
+    # first arg is $next if the hook matches around
+    return shift->() if $post_hook =~ /around/;
   });
 
   $app->routes->get('/nytprof/profiles/:file'

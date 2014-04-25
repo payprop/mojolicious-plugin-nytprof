@@ -20,8 +20,9 @@ WriteMakefile(
     'File::Spec::Functions' => '3.30',
   },
   BUILD_REQUIRES => {
-    'Test::More'      => 0,
-    'Test::Exception' => 0.32,
+    'Test::More'               => 0,
+    'Test::Exception'          => 0.32,
+    'Algorithm::Combinatorics' => 0.27,
   },
   META_MERGE => {
     resources => {
