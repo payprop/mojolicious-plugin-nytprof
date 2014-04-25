@@ -147,6 +147,7 @@ sub _add_hooks {
   # TODO: allow control of hooks with config variables
   $app->hook(before_routes => sub {
     my $c = shift;
+    return if $c->stash->{'mojo.static'}; # static files
     my $path = $c->req->url->to_string;
     return if $path =~ m{^/nytprof}; # viewing profiles
     $path =~ s!^/!!g;
