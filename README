@@ -3,7 +3,7 @@ NAME
     Mojolicious app
 
 VERSION
-    0.05
+    0.06
 
 DESCRIPTION
     This plugin enables Mojolicious to automatically generate Devel::NYTProf
@@ -86,7 +86,7 @@ CONFIGURATION
           # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
           # for a complete list. N.B. you can't supply start or file as these
           # are used internally in the plugin so will be ignored if passed
-          env {
+          env => {
             trace => 1,
             log   => "/path/to/foo/",
             ....

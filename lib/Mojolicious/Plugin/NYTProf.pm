@@ -6,7 +6,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.05
+0.06
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 METHODS
 
@@ -105,7 +105,7 @@ Here's what you can control in myapp.conf:
       # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
       # for a complete list. N.B. you can't supply start or file as these
       # are used internally in the plugin so will be ignored if passed
-      env {
+      env => {
         trace => 1,
         log   => "/path/to/foo/",
         ....
