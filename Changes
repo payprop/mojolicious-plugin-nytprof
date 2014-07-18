@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.07     Ven 18 jul 2014 14:28:34 CEST
+        * [Fix] Tests will BAIL_OUT when nytprofhtml is not found
+        * [Fix] Warning from bad entry in MANIFEST file
+        * [Add] Travis CI config
+
 0.06     Ven 25 avr 2014 12:49:06 CEST
         * [Fix] Errors in perldoc
 
