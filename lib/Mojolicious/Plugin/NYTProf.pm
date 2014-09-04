@@ -6,7 +6,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.06
+0.08
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 METHODS
 
@@ -356,12 +356,18 @@ sub _generate_profile {
     }
   }
 
-  $self->redirect_to("${file}/index.html");
+  $self->redirect_to("/${file}/index.html");
 }
 
 =head1 AUTHOR
 
 Lee Johnson - C<leejo@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. If you would like to contribute documentation
+please raise an issue / pull request:
+
+    https://github.com/leejo/mojolicious-plugin-nytprof
 
 =cut
 

@@ -1,10 +1,11 @@
 Changes
 Makefile.PL
-README
+README.md
 README.pod
 lib/Mojolicious/Plugin/NYTProf.pm
 t/000_prerequisites.t
 t/001_compiles_pod.t
+t/003_changes.t
 t/005_plugin_not_configured.t
 t/010_nytprof.t
 t/015_no_static.t
