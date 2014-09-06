@@ -3,6 +3,7 @@ Makefile.PL
 README.md
 README.pod
 lib/Mojolicious/Plugin/NYTProf.pm
+MANIFEST
 t/000_prerequisites.t
 t/001_compiles_pod.t
 t/003_changes.t
