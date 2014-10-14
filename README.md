@@ -1,20 +1,25 @@
-[![Build Status](https://travis-ci.org/leejo/mojolicious-plugin-nytprof.svg?branch=master)](https://travis-ci.org/leejo/mojolicious-plugin-nytprof)
-
-## NAME
+# NAME
 
 Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicious app
 
-## VERSION
+<div>
 
-0.06
+</div>
 
-## DESCRIPTION
+<a href='https://travis-ci.org/leejo/mojolicious-plugin-nytprof?branch=master'><img src='https://travis-ci.org/leejo/mojolicious-plugin-nytprof.svg?branch=master' alt='Build Status' /></a>
+<a href='https://coveralls.io/r/leejo/mojolicious-plugin-nytprof?branch=master'><img src='https://coveralls.io/repos/leejo/mojolicious-plugin-nytprof/badge.png?branch=master' alt='Coverage Status' /></a>
+
+# VERSION
+
+0.09
+
+# DESCRIPTION
 
 This plugin enables [Mojolicious](https://metacpan.org/pod/Mojolicious) to automatically generate Devel::NYTProf
 profiles and routes for your app, it has been inspired by
 [Dancer::Plugin::NYTProf](https://metacpan.org/pod/Dancer::Plugin::NYTProf)
 
-## SYNOPSIS
+# SYNOPSIS
 
     use Mojolicious::Lite;
 
@@ -44,16 +49,16 @@ Or
 Then run your app. Profiles generated can be seen by visting /nytprof and reports
 will be generated on the fly why you click on a specific profile.
 
-## METHODS
+# METHODS
 
-### register
+## register
 
 Registers the plugin with your app - this will only do something if the nytprof
 key exists in your config hash
 
     $self->register($app, \%config);
 
-## HOOKS AND Devel::NYTProf
+# HOOKS AND Devel::NYTProf
 
 The plugin adds hooks to control the level of profiling, Devel::NYTProf profiling
 is started using a before\_routes hook and the stopped with an after\_dispatch hook.
@@ -64,7 +69,7 @@ rendering code and will not see most of the actual Mojolicious framework detail.
 You can override the hooks used to control when the profiling runs, see the
 CONFIGURATION section below.
 
-## CONFIGURATION
+# CONFIGURATION
 
 Here's what you can control in myapp.conf:
 
@@ -112,6 +117,14 @@ Here's what you can control in myapp.conf:
       },
     }
 
-## AUTHOR
+# AUTHOR
 
 Lee Johnson - `leejo@cpan.org`
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. If you would like to contribute documentation
+please raise an issue / pull request:
+
+    https://github.com/leejo/mojolicious-plugin-nytprof

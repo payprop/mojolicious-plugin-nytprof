@@ -15,3 +15,5 @@ t/025_nytprof_env.t
 t/030_config_hooks.t
 t/public/some_static_file
 t/test_app.pl
+t/nytprof/profiles/.exists
+t/nytprof/html/.exists
