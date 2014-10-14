@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.11     2014-10-14
+        - [Fix] Broken POD for coverage/build badges
+
 0.10     2014-10-14
         - [Fix] Add couple of files to MANIFEST that may have been causing test
             failues on some platforms / version of perl

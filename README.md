@@ -4,14 +4,13 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 <div>
 
+    <a href='https://travis-ci.org/leejo/mojolicious-plugin-nytprof?branch=master'><img src='https://travis-ci.org/leejo/mojolicious-plugin-nytprof.svg?branch=master' alt='Build Status' /></a>
+    <a href='https://coveralls.io/r/leejo/mojolicious-plugin-nytprof?branch=master'><img src='https://coveralls.io/repos/leejo/mojolicious-plugin-nytprof/badge.png?branch=master' alt='Coverage Status' /></a>
 </div>
-
-<a href='https://travis-ci.org/leejo/mojolicious-plugin-nytprof?branch=master'><img src='https://travis-ci.org/leejo/mojolicious-plugin-nytprof.svg?branch=master' alt='Build Status' /></a>
-<a href='https://coveralls.io/r/leejo/mojolicious-plugin-nytprof?branch=master'><img src='https://coveralls.io/repos/leejo/mojolicious-plugin-nytprof/badge.png?branch=master' alt='Coverage Status' /></a>
 
 # VERSION
 
-0.10
+0.11
 
 # DESCRIPTION
 
