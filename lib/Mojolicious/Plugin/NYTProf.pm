@@ -11,7 +11,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.09
+0.10
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 METHODS
 

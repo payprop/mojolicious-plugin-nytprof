@@ -1,9 +1,14 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
-0.08     2014-09-06
+0.10     2014-10-14
+        - [Fix] Add couple of files to MANIFEST that may have been causing test
+            failues on some platforms / version of perl
+
+0.09     2014-09-06
+        - [Fix] Kwalitee issues in distribution
 
 0.08     2014-09-04
-        - [Fix] Kwalitee issues in distribution
+        - [Fix] compatible with latest version of Mojolicious (5.37)
 
 0.07     2014-07-18
         - [Fix] Tests will BAIL_OUT when nytprofhtml is not found
