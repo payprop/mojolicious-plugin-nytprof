@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 METHODS
 
@@ -138,13 +138,24 @@ sub register {
 
     return if $app->mode eq 'production' and ! $nytprof->{allow_production};
 
-    my $nytprofhtml_path = $nytprof->{nytprofhtml_path}
-      || File::Which::which('nytprofhtml');
+    my $nytprofhtml_path;
 
-    if ( ! $nytprofhtml_path ) {
-      # last ditch attempt to find nytprofhtml, assume in same dir as perl
+    if ( $nytprofhtml_path = $nytprof->{nytprofhtml_path} ) {
+      # no sanity checking here, if a path is configured we use it
+      # and don't fall through to defaults
+    } else {
+
+      # fall back, assume nytprofhtml_path in same dir as perl
       $nytprofhtml_path = $^X;
       $nytprofhtml_path =~ s/perl[\d\.]*$/nytprofhtml/;
+
+      if ( ! -e $nytprofhtml_path ) {
+        # last ditch attempt to find nytprofhtml, use File::Which
+        # (last ditch in that it may return a different nytprofhtml
+        # that is using a differently configured perl, e.g. system,
+        # this may die with incompat config errorrs but at least try)
+        $nytprofhtml_path = File::Which::which('nytprofhtml');
+      }
     }
 
     -e $nytprofhtml_path

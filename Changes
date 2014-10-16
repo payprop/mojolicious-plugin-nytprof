@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.12     2014-10-15
+        - [Fix] Default path for nytprofhtml when not supplied tweaked to use
+            more sensible ordering
+
 0.11     2014-10-14
         - [Fix] Broken POD for coverage/build badges
 
