@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 METHODS
 
@@ -73,7 +73,7 @@ key exists in your config hash
 =head1 HOOKS AND Devel::NYTProf
 
 The plugin adds hooks to control the level of profiling, Devel::NYTProf profiling
-is started using a before_routes hook and the stopped with an after_dispatch hook.
+is started using a before_routes hook and the stopped with an around_dispatch hook.
 
 The consequence of this is that you should see profiling only for your routes and
 rendering code and will not see most of the actual Mojolicious framework detail.
@@ -120,12 +120,18 @@ Here's what you can control in myapp.conf:
       # and finish_profile. the values show here are the defaults so you
       # do not need to provide these options
       #
+      # bear in mind the caveats in the Mojolicious docs regarding hooks
+      # and that they may not fire in the order you expect - this can
+      # affect the NYTProf output and cause some things not to appear
+      # (or appear in the wrong order). the defaults below should be 
+      # sufficient for profiling your code, however you can change these
+      #
       # N.B. there is nothing stopping you reversing the order of the
       # hooks, which would cause the Mojolicious framework code to be
       # profiled, or providing hooks that are the same or even invalid. these
       # config options should probably be used with some care
       pre_hook  => 'before_routes',
-      post_hook => 'after_dispatch',
+      post_hook => 'around_dispatch',
     },
   }
 
@@ -207,7 +213,7 @@ sub _add_hooks {
   my $nytprof   = $config->{nytprof};
   my $prof_dir  = $nytprof->{profiles_dir} || 'nytprof';
   my $pre_hook  = $nytprof->{pre_hook}     || 'before_routes';
-  my $post_hook = $nytprof->{post_hook}    || 'after_dispatch';
+  my $post_hook = $nytprof->{post_hook}    || 'around_dispatch';
   my $disable   = $nytprof->{disable}      || 0;
 
   # add the nytprof/html directory to the static paths
@@ -246,10 +252,13 @@ sub _add_hooks {
   });
 
   $app->hook($post_hook => sub {
-    DB::disable_profile() unless $disable;
-    DB::finish_profile() unless $disable;
-    # first arg is $next if the hook matches around
-    return shift->() if $post_hook =~ /around/;
+    if ($post_hook =~ /around/) {
+      # first arg is $next if the hook matches around
+      shift->();
+      DB::finish_profile() unless $disable;
+    } else {
+      DB::finish_profile() unless $disable;
+    }
   });
 
   $app->routes->get('/nytprof/profiles/:file'

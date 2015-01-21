@@ -11,7 +11,7 @@ sub startup {
             trace => 1,
             log => '/tmp/nytprof.log',
             pre_hook  => 'before_routes',
-            post_hook => 'after_dispatch',
+            post_hook => 'around_dispatch',
         },
     });
 
