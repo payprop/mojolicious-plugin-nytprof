@@ -1,5 +1,10 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.13     2015-01-22
+        - [Fix] Lack of flame graph in profile for certain combinations of
+            mojolicious code layout by changing default post hook to
+            around_dispatch (thanks to gmorten1 for the bug report)
+
 0.12     2014-10-15
         - [Fix] Default path for nytprofhtml when not supplied tweaked to use
             more sensible ordering

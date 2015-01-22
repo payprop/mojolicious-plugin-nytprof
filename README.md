@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 # VERSION
 
-0.11
+0.13
 
 # DESCRIPTION
 
@@ -60,7 +60,7 @@ key exists in your config hash
 # HOOKS AND Devel::NYTProf
 
 The plugin adds hooks to control the level of profiling, Devel::NYTProf profiling
-is started using a before\_routes hook and the stopped with an after\_dispatch hook.
+is started using a before\_routes hook and the stopped with an around\_dispatch hook.
 
 The consequence of this is that you should see profiling only for your routes and
 rendering code and will not see most of the actual Mojolicious framework detail.
@@ -107,12 +107,18 @@ Here's what you can control in myapp.conf:
         # and finish_profile. the values show here are the defaults so you
         # do not need to provide these options
         #
+        # bear in mind the caveats in the Mojolicious docs regarding hooks
+        # and that they may not fire in the order you expect - this can
+        # affect the NYTProf output and cause some things not to appear
+        # (or appear in the wrong order). the defaults below should be 
+        # sufficient for profiling your code, however you can change these
+        #
         # N.B. there is nothing stopping you reversing the order of the
         # hooks, which would cause the Mojolicious framework code to be
         # profiled, or providing hooks that are the same or even invalid. these
         # config options should probably be used with some care
         pre_hook  => 'before_routes',
-        post_hook => 'after_dispatch',
+        post_hook => 'around_dispatch',
       },
     }
 
