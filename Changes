@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.14     2015-02-25
+        - [Fix] ->render_not_found becomes ->reply->not_found in v6 of Mojo
+            have to bump min version of Mojolicious required to 6.00 for this
+        - [Fix] bump min version of Devel::NYTProf to 5.07 so will install
+            with blead perl
+
 0.13     2015-01-22
         - [Fix] Lack of flame graph in profile for certain combinations of
             mojolicious code layout by changing default post hook to

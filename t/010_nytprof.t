@@ -74,6 +74,9 @@ $t->get_ok('/nytprof')
   ->status_is(200)
   ->content_like(qr{<a href="/nytprof/profiles/nytprof_out_\d+_\d+_some_route_\d+">});
 
+$t->get_ok("/nytprof/profiles/nytprof_out_111_111_some_route_111")
+  ->status_is(404);
+
 $t->get_ok($profiles[0]->{url})
   ->status_is(200);
 

@@ -6,14 +6,15 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+  MIN_PERL_VERSION => '5.10.1',
   NAME          => 'Mojolicious::Plugin::NYTProf',
   ABSTRACT_FROM => 'lib/Mojolicious/Plugin/NYTProf.pm',
   VERSION_FROM  => 'lib/Mojolicious/Plugin/NYTProf.pm',
   AUTHOR        => 'Lee Johnson <leejo@cpan.org>',
   LICENSE       => 'perl',
   PREREQ_PM => {
-    'Devel::NYTProf'        => '5.06',
-    'Mojolicious'           => '5.37',
+    'Devel::NYTProf'        => '5.07',
+    'Mojolicious'           => '6.00',
     'File::Which'           => '1.09',
     'File::Temp'            => '0.22',
     'Time::HiRes'           => '1.9719',

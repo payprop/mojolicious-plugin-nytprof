@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.13
+0.14
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 METHODS
 
@@ -351,7 +351,7 @@ sub _generate_profile {
 
   my $file    = $self->stash('file');
   my $profile = catfile($prof_dir,'profiles',$file);
-  return $self->render_not_found if !-f $profile;
+  return $self->reply->not_found if !-f $profile;
   
   foreach my $sub_dir (
     $htmldir,

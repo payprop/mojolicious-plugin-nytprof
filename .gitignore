@@ -9,3 +9,4 @@ nytprof.out
 Mojolicious-Plugin-NYTProf*.gz
 cover_db
 t/nytprof
+nytprof/
