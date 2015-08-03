@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.15     2015-08-03
+        - [Fix] Test on Win32 platforms due to use of : and = chars in NYTProf
+            opts and env variables (GH #6, thanks to xlat for the patch)
+
 0.14     2015-02-25
         - [Fix] ->render_not_found becomes ->reply->not_found in v6 of Mojo
             have to bump min version of Mojolicious required to 6.00 for this

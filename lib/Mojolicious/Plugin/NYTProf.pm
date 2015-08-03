@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 METHODS
 
@@ -153,7 +153,7 @@ sub register {
 
       # fall back, assume nytprofhtml_path in same dir as perl
       $nytprofhtml_path = $^X;
-      $nytprofhtml_path =~ s/perl[\d\.]*$/nytprofhtml/;
+      $nytprofhtml_path =~ s/w?perl[\d\.]*(?:\.exe)?$/nytprofhtml/;
 
       if ( ! -e $nytprofhtml_path ) {
         # last ditch attempt to find nytprofhtml, use File::Which
@@ -193,6 +193,7 @@ sub register {
       # the start and file options here
       $nytprof->{env}{start} = 'no';
       $nytprof->{env}{file}  = $file;
+      s/([:=])/\\$1/g for grep{ defined() } values %{ $nytprof->{env} };
 
       $ENV{NYTPROF} = join( ':',
         map { "$_=" . $nytprof->{env}{$_} }
@@ -332,7 +333,7 @@ sub _profiles {
     my ($nytprof,$duration);
     eval { $nytprof = Devel::NYTProf::Data->new({filename => $filepath}); };
 
-    $profile->{duration} = $nytprof
+    $profile->{duration} = $nytprof && $nytprof->attributes->{profiler_duration}
       ? sprintf('%.4f secs', $nytprof->attributes->{profiler_duration})
       : '??? seconds - corrupt profile data?';
 
