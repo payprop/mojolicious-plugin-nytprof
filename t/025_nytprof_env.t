@@ -21,7 +21,7 @@ unlink(catfile($prof_dir,"nytprof.trace"));
 
 {
   use Mojolicious::Lite;
-
+  $prof_dir =~ s{\\}{/}g;   #not found the right place to fix this in plugin source!
   plugin NYTProf => {
     nytprof => {
       profiles_dir => $prof_dir,
