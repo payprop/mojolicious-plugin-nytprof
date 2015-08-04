@@ -42,7 +42,7 @@ my $t = Test::Mojo->new;
 
 #fake MSWin32
 {
-    local $^O = 'MSWin32';
+	$t->app->hook(before_dispatch => sub { $^O = 'MSWin32'; });
     $t->get_ok(
         '/some_route?arg1=test&arg2=colon:colon&arg3=' . ( 'v' x 260 ) )
         ->status_is(200)->content_is("basic stuff\n");

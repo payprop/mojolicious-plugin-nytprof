@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.16     2015-08-04
+        - [Fix] MSWin32 filename invalid chars ':','?' and length limitation of
+            260 chars (GH #8, thanks to xlat for the patch)
+
 0.15     2015-08-03
         - [Fix] Test on Win32 platforms due to use of : and = chars in NYTProf
             opts and env variables (GH #6, thanks to xlat for the patch)
