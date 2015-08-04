@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 # VERSION
 
-0.14
+0.15
 
 # DESCRIPTION
 
