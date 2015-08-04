@@ -244,11 +244,16 @@ sub _add_hooks {
     return if $path =~ m{^/nytprof}; # viewing profiles
     $path =~ s!^/!!g;
     $path =~ s!/!-!g;
+    $path =~ s![:?]!-!g if $^O eq 'MSWin32';
 
     my ($sec, $usec) = gettimeofday;
-    DB::enable_profile(
-      catfile($prof_sub_dir,"nytprof_out_${sec}_${usec}_${path}_$$")
-    ) unless $disable;
+    my $profile = catfile($prof_sub_dir,"nytprof_out_${sec}_${usec}_${path}_$$");
+    if($^O eq 'MSWin32' && length($profile)>259){
+      my $overflow = length($profile) - 259;
+      $path = substr($path, 0,length($path) - $overflow -1);
+      $profile = catfile($prof_sub_dir,"nytprof_out_${sec}_${usec}_${path}_$$");
+    }
+    DB::enable_profile( $profile ) unless $disable;
     return $next->() if $pre_hook =~ /around/;
   });
 
