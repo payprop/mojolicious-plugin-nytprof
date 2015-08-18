@@ -181,18 +181,11 @@ sub register {
 
     # disable config option is undocumented, it allows testing where we
     # don't actually load or run Devel::NYTProf
-    unless ($nytprof->{disable}) {
-      my $tempfh = File::Temp->new(
-        ($nytprof->{profiles_dir} ? (DIR => $nytprof->{profiles_dir}) : () ),
-      );
-      my $file      = $tempfh->filename;
-      $tempfh       = undef; # let the file get deleted
-
+    if (!$nytprof->{disable}) {
       # https://metacpan.org/pod/Devel::NYTProf#NYTPROF-ENVIRONMENT-VARIABLE
       # options for Devel::NYTProf - any can be passed but will always set
       # the start and file options here
       $nytprof->{env}{start} = 'no';
-      $nytprof->{env}{file}  = $file;
       s/([:=])/\\$1/g for grep{ defined() } values %{ $nytprof->{env} };
 
       $ENV{NYTPROF} = join( ':',
@@ -201,7 +194,6 @@ sub register {
       );
 
       require Devel::NYTProf;
-      unlink $file;
     }
 
     $self->_add_hooks($app, $config, $nytprofhtml_path);
@@ -216,6 +208,7 @@ sub _add_hooks {
   my $pre_hook  = $nytprof->{pre_hook}     || 'before_routes';
   my $post_hook = $nytprof->{post_hook}    || 'around_dispatch';
   my $disable   = $nytprof->{disable}      || 0;
+  my $log       = $app->log;
 
   # add the nytprof/html directory to the static paths
   # so we can serve these without having to add routes
@@ -253,23 +246,27 @@ sub _add_hooks {
       $path = substr($path, 0,length($path) - $overflow -1);
       $profile = catfile($prof_sub_dir,"nytprof_out_${sec}_${usec}_${path}_$$");
     }
-    DB::enable_profile( $profile ) unless $disable;
+    $log->debug( 'starting NYTProf' );
+    # note that we are passing a custom file to enable_profile, this results in
+    # a timing bug causing multiple calls to this plugin (in the order of 10^5)
+    # to gradually slow down. see GH #5
+    DB::enable_profile( $profile ) if ! $disable;
     return $next->() if $pre_hook =~ /around/;
   });
 
   $app->hook($post_hook => sub {
-    if ($post_hook =~ /around/) {
-      # first arg is $next if the hook matches around
-      shift->();
-      DB::finish_profile() unless $disable;
-    } else {
-      DB::finish_profile() unless $disable;
-    }
+    # first arg is $next if the hook matches around
+    shift->() if $post_hook =~ /around/;
+    DB::finish_profile() if ! $disable;
+    $log->debug( 'finished NYTProf' );
   });
 
   $app->routes->get('/nytprof/profiles/:file'
     => [file => qr/nytprof_out_\d+_\d+.*/]
-    => sub { _generate_profile(@_,$prof_dir,$nytprofhtml_path) }
+    => sub {
+      $log->debug( "generating profile for $nytprofhtml_path" );
+      _generate_profile(@_,$prof_dir,$nytprofhtml_path)
+    }
   );
 
   $app->routes->get('/nytprof' => sub { _list_profiles(@_,$prof_sub_dir) });
@@ -280,6 +277,7 @@ sub _list_profiles {
   my $prof_dir = shift;
 
   my @profiles = _profiles($prof_dir);
+  $self->app->log->debug( scalar( @profiles ) . ' profiles found' );
 
   # could use epl here, but users might be using a different Template engine
   my $list = @profiles
