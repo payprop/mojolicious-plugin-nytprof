@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.17     2015-10-21
+        - [Doc] Move github repo to G3S org
+
 0.16     2015-08-04
         - [Fix] MSWin32 filename invalid chars ':','?' and length limitation of
             260 chars (GH #8, thanks to xlat for the patch)
