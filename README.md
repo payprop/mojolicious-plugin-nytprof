@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 # VERSION
 
-0.17
+0.18
 
 # DESCRIPTION
 
@@ -121,6 +121,14 @@ Here's what you can control in myapp.conf:
         post_hook => 'around_dispatch',
       },
     }
+
+# nytprofhtml LOCATION
+
+The plugin does its best to find the path to your nytprofhtml executable, if
+it cannot find it then it will die with an error. This also affects testing,
+and any tests will be skipped if they cannot find nytprofhtml allowing you to
+install the plugin - you will then need to make sure to set the path in your
+config using nytprofhtml\_path
 
 # AUTHOR
 

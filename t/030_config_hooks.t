@@ -12,6 +12,10 @@ use FindBin '$Bin';
 use File::Path qw'rmtree';
 use Algorithm::Combinatorics 'variations_with_repetition';
 
+use Mojolicious::Plugin::NYTProf;
+Mojolicious::Plugin::NYTProf::_find_nytprofhtml()
+	|| plan skip_all => "Couldn't find nytprofhtml in PATH or in same location as $^X";
+
 my $prof_dir = catfile($Bin,"nytprof");
 
 my @hooks = qw/

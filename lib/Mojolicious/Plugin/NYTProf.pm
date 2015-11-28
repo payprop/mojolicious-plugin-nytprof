@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.17
+0.18
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 METHODS
 
@@ -135,6 +135,14 @@ Here's what you can control in myapp.conf:
     },
   }
 
+=head1 nytprofhtml LOCATION
+
+The plugin does its best to find the path to your nytprofhtml executable, if
+it cannot find it then it will die with an error. This also affects testing,
+and any tests will be skipped if they cannot find nytprofhtml allowing you to
+install the plugin - you will then need to make sure to set the path in your
+config using nytprofhtml_path
+
 =cut
 
 sub register {
@@ -150,22 +158,11 @@ sub register {
       # no sanity checking here, if a path is configured we use it
       # and don't fall through to defaults
     } else {
-
-      # fall back, assume nytprofhtml_path in same dir as perl
-      $nytprofhtml_path = $^X;
-      $nytprofhtml_path =~ s/w?perl[\d\.]*(?:\.exe)?$/nytprofhtml/;
-
-      if ( ! -e $nytprofhtml_path ) {
-        # last ditch attempt to find nytprofhtml, use File::Which
-        # (last ditch in that it may return a different nytprofhtml
-        # that is using a differently configured perl, e.g. system,
-        # this may die with incompat config errorrs but at least try)
-        $nytprofhtml_path = File::Which::which('nytprofhtml');
-      }
+      $nytprofhtml_path = _find_nytprofhtml();
     }
 
-    -e $nytprofhtml_path
-      or die "Could not find nytprofhtml script.  Ensure it's in your path, "
+    $nytprofhtml_path && -e $nytprofhtml_path
+      or die "Could not find nytprofhtml script. Ensure it's in your path, "
       . "or set the nytprofhtml_path option in your config.";
 
     # Devel::NYTProf will create an nytprof.out file immediately so
@@ -198,6 +195,23 @@ sub register {
 
     $self->_add_hooks($app, $config, $nytprofhtml_path);
   }
+}
+
+sub _find_nytprofhtml {
+  # fall back, assume nytprofhtml_path in same dir as perl
+  my $nytprofhtml_path = $^X;
+  $nytprofhtml_path =~ s/w?perl[\d\.]*(?:\.exe)?$/nytprofhtml/;
+
+  if ( ! -e $nytprofhtml_path ) {
+    # last ditch attempt to find nytprofhtml, use File::Which
+    # (last ditch in that it may return a different nytprofhtml
+    # that is using a differently configured perl, e.g. system,
+    # this may die with incompat config errorrs but at least try)
+    $nytprofhtml_path = File::Which::which('nytprofhtml');
+  }
+
+  return $nytprofhtml_path && -e $nytprofhtml_path
+    ? $nytprofhtml_path : undef;
 }
 
 sub _add_hooks {

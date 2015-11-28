@@ -11,6 +11,10 @@ use File::Spec::Functions 'catfile';
 use FindBin '$Bin';
 use File::Path qw'rmtree';
 
+use Mojolicious::Plugin::NYTProf;
+Mojolicious::Plugin::NYTProf::_find_nytprofhtml()
+	|| plan skip_all => "Couldn't find nytprofhtml in PATH or in same location as $^X";
+
 # run this test with -v and pipe output to a log file to
 # see the difference in run time between the first calls
 # to the route and the last calls to the route. see GH #5

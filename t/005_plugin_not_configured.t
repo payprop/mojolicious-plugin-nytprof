@@ -6,6 +6,10 @@ use warnings;
 use Test::More;
 use Test::Mojo;
 
+use Mojolicious::Plugin::NYTProf;
+Mojolicious::Plugin::NYTProf::_find_nytprofhtml()
+	|| plan skip_all => "Couldn't find nytprofhtml in PATH or in same location as $^X";
+
 {
   use Mojolicious::Lite;
   plugin NYTProf => {};

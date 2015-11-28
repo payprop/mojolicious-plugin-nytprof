@@ -4,20 +4,10 @@ use strict;
 use warnings;
 
 use Test::More;
+use Mojolicious::Plugin::NYTProf;
 
-use File::Find;
-use File::Which;
+Mojolicious::Plugin::NYTProf::_find_nytprofhtml()
+	|| plan skip_all => "Couldn't find nytprofhtml in PATH or in same location as $^X";
 
-my $nytprofhtml_path = File::Which::which('nytprofhtml');
-
-if ( ! $nytprofhtml_path ) {
-  # last ditch attempt to find nytprofhtml, assume in same dir as perl
-  $nytprofhtml_path = $^X;
-  $nytprofhtml_path =~ s/perl[\d\.]*$/nytprofhtml/;
-}
-
-BAIL_OUT( "Couldn't find nytprofhtml in PATH or in same location as $^X" )
-	if ! -e $nytprofhtml_path;
-
-ok( -e $nytprofhtml_path );
+pass( "found nytprofhtml" );
 done_testing();
