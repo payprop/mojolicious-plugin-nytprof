@@ -46,7 +46,7 @@ Or
   }
 
 Then run your app. Profiles generated can be seen by visting /nytprof and reports
-will be generated on the fly why you click on a specific profile.
+will be generated on the fly when you click on a specific profile.
 
 =cut
 
