@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 =head1 VERSION
 
-0.18
+0.19
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ use File::Temp;
 use File::Which;
 use File::Spec::Functions qw/catfile catdir/;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 METHODS
 
@@ -252,6 +252,7 @@ sub _add_hooks {
     $path =~ s!^/!!g;
     $path =~ s!/!-!g;
     $path =~ s![:?]!-!g if $^O eq 'MSWin32';
+    $path =~ s!\?.*$!!g; # remove URL query params
 
     my ($sec, $usec) = gettimeofday;
     my $profile = catfile($prof_sub_dir,"nytprof_out_${sec}_${usec}_${path}_$$");

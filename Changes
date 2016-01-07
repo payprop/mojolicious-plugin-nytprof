@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.19     2016-01-07
+        - [Fix] Remove URL query params from output profile files
+
 0.18     2015-11-28
         - [Fix] Skip some tests if nytprofhtml can't be found
         - [Doc] For the above and what to do in that case

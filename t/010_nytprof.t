@@ -61,7 +61,7 @@ ok(
   'nytprof.out file not created'
 );
 
-$t->get_ok('/some_route')
+$t->get_ok('/some_route?foo=bar&boz=baz&id=123%7C456')
   ->status_is(200)
   ->content_is("basic stuff\n") for 1 .. 3;
 
@@ -76,7 +76,7 @@ $t->ua->max_redirects(5);
 
 $t->get_ok('/nytprof')
   ->status_is(200)
-  ->content_like(qr{<a href="/nytprof/profiles/nytprof_out_\d+_\d+_some_route_\d+">});
+  ->content_like(qr{<a href="/nytprof/profiles/nytprof_out_\d+_\d+_some_route.*?_\d+">});
 
 $t->get_ok("/nytprof/profiles/nytprof_out_111_111_some_route_111")
   ->status_is(404);
