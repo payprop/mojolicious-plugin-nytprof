@@ -29,8 +29,8 @@ WriteMakefile(
     resources => {
       license    => 'http://dev.perl.org/licenses/',
       homepage   => 'https://metacpan.org/module/Mojolicious::Plugin::NYTProf',
-      bugtracker => 'https://github.com/G3S/mojolicious-plugin-nytprof/issues',
-      repository => 'https://github.com/G3S/mojolicious-plugin-nytprof'
+      bugtracker => 'https://github.com/Humanstate/mojolicious-plugin-nytprof/issues',
+      repository => 'https://github.com/Humanstate/mojolicious-plugin-nytprof'
     },
   },
   test => {

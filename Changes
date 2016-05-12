@@ -8,7 +8,7 @@ Revision history for Mojolicious-Plugin-NYTProf
         - [Doc] For the above and what to do in that case
 
 0.17     2015-10-21
-        - [Doc] Move github repo to G3S org
+        - [Doc] Move github repo to Humanstate org
 
 0.16     2015-08-04
         - [Fix] MSWin32 filename invalid chars ':','?' and length limitation of
