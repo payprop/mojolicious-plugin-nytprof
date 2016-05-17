@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-NYTProf
 
+0.20     2016-05-17
+        - Transfer repo from G3S to Humanstate
+
 0.19     2016-01-07
         - [Fix] Remove URL query params from output profile files
 
