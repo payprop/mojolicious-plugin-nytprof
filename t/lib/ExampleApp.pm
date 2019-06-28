@@ -11,7 +11,7 @@ sub startup {
             trace => 1,
             log => '/tmp/nytprof.log',
             pre_hook  => 'before_routes',
-            post_hook => 'around_dispatch',
+            post_hook => 'after_dispatch',
         },
     });
 
@@ -20,6 +20,8 @@ sub startup {
     $self->routes->any('/t3')->to('ExampleController#t3');
     $self->routes->any('/t4')->to('ExampleController#t4');
     $self->routes->any('/t5')->to('ExampleController#t5');
+
+	$self->routes->any('/nonblock')->to('ExampleController#nonblock');
 }
 
 1;
