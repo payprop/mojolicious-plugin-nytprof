@@ -10,7 +10,7 @@ Mojolicious::Plugin::NYTProf - Auto handling of Devel::NYTProf in your Mojolicio
 
 # VERSION
 
-0.22
+0.23
 
 # DESCRIPTION
 
@@ -45,7 +45,17 @@ Or
       $self->plugin(NYTProf => $mojo_config);
     }
 
-Then run your app. Profiles generated can be seen by visting /nytprof and reports
+Then run your app - you should start your app with the env variables:
+
+    PERL5OPT='-d:NYTProf'
+    NYTPROF=start=no
+
+without this, things go a bit haywire (most obviously manifested as broken links
+in the report) because otherwise any code compiled before the `plugin` call
+cannot be covered, as described in the docs:
+[https://metacpan.org/pod/Devel::NYTProf#RUN-TIME-CONTROL-OF-PROFILING](https://metacpan.org/pod/Devel::NYTProf#RUN-TIME-CONTROL-OF-PROFILING)
+
+Profiles generated can be seen by visting /nytprof and reports
 will be generated on the fly when you click on a specific profile.
 
 # METHODS
